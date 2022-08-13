@@ -26,6 +26,7 @@ extension AddExtension on Set<Marker> {
     bool result = false;
     await createCustomMarkerBitmap(
       labelMarker.label,
+      labelMarker.hasBorder,
       backgroundColor: labelMarker.backgroundColor,
       textStyle: labelMarker.textStyle,
     ).then((value) {
@@ -52,7 +53,7 @@ extension AddExtension on Set<Marker> {
   }
 }
 
-Future<BitmapDescriptor> createCustomMarkerBitmap(String title,
+Future<BitmapDescriptor> createCustomMarkerBitmap(String title, bool hasBorder,
     {required TextStyle textStyle,
     Color backgroundColor = Colors.blueAccent}) async {
   TextSpan span = TextSpan(
@@ -74,6 +75,15 @@ Future<BitmapDescriptor> createCustomMarkerBitmap(String title,
   painter.paint(canvas, const Offset(20.0, 10.0));
   int textWidth = painter.width.toInt();
   int textHeight = painter.height.toInt();
+  if (hasBorder) {
+    canvas.drawRRect(
+        RRect.fromLTRBAndCorners(0, 0, textWidth + 40, textHeight + 20,
+            bottomLeft: const Radius.circular(13),
+            bottomRight: const Radius.circular(13),
+            topLeft: const Radius.circular(13),
+            topRight: const Radius.circular(13)),
+        Paint()..color = Colors.black);
+  }
   canvas.drawRRect(
       RRect.fromLTRBAndCorners(0, 0, textWidth + 40, textHeight + 20,
           bottomLeft: const Radius.circular(10),
@@ -158,6 +168,9 @@ class LabelMarker {
   /// earlier, and thus appearing to be closer to the surface of the Earth.
   final double zIndex;
 
+  /// controlls if the marker has a stroke or not
+  final bool hasBorder;
+
   /// Callbacks to receive tap events for markers placed on this map.
   final VoidCallback? onTap;
 
@@ -200,6 +213,7 @@ class LabelMarker {
     this.rotation = 0.0,
     this.visible = true,
     this.zIndex = 0.0,
+    this.hasBorder = false,
     this.onTap,
     this.onDrag,
     this.onDragStart,
